@@ -344,5 +344,36 @@ LoraHelper::DoPrintSimulationTime (Time interval)
   Simulator::Schedule (interval, &LoraHelper::DoPrintSimulationTime, this, interval);
 }
 
+void
+LoraHelper::PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
+                             std::string filename)
+{
+  const char * c = filename.c_str ();
+  std::ofstream spreadingFactorFile;
+  spreadingFactorFile.open (c);
+  for (NodeContainer::Iterator j = endDevices.Begin (); j != endDevices.End (); ++j)
+    {
+      Ptr<Node> object = *j;
+      Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
+      NS_ASSERT (position != 0);
+      Ptr<NetDevice> netDevice = object->GetDevice (0);
+      Ptr<LoraNetDevice> loraNetDevice = netDevice->GetObject<LoraNetDevice> ();
+      NS_ASSERT (loraNetDevice != 0);
+      Ptr<EndDeviceLoraMac> mac = loraNetDevice->GetMac ()->GetObject<EndDeviceLoraMac> ();
+      int sf = int(mac->GetDataRate ());
+      Vector pos = position->GetPosition ();
+      spreadingFactorFile << pos.x << " " << pos.y << " " << sf << std::endl;
+    }
+  // Also print the gateways
+  for (NodeContainer::Iterator j = gateways.Begin (); j != gateways.End (); ++j)
+    {
+      Ptr<Node> object = *j;
+      Ptr<MobilityModel> position = object->GetObject<MobilityModel> ();
+      Vector pos = position->GetPosition ();
+      spreadingFactorFile << pos.x << " " << pos.y << " GW" << std::endl;
+    }
+  spreadingFactorFile.close ();
+}
+
 }
 }

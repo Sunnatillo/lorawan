@@ -123,6 +123,10 @@ public:
   void DoPrintDeviceStatus (NodeContainer endDevices, NodeContainer gateways,
                             std::string filename);
 
+//man qo`shganim
+  void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
+                        std::string filename);
+
 private:
   /**
    * Actually print the simulation time and re-schedule execution of this
