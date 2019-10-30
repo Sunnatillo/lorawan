@@ -126,6 +126,8 @@ public:
 //man qo`shganim
   void PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
                         std::string filename);
+  void DoPrintPhyPerformancePerGw (NodeContainer gateways, std::string filename,
+                                  Time startTime,Time stopTime);
 
 private:
   /**

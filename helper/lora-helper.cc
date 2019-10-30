@@ -375,5 +375,38 @@ LoraHelper::PrintEndDevices (NodeContainer endDevices, NodeContainer gateways,
   spreadingFactorFile.close ();
 }
 
+//my print Sunnatillo
+void
+LoraHelper::DoPrintPhyPerformancePerGw (NodeContainer gateways,
+                                   std::string filename,Time startTime,Time stopTime)
+    {
+      NS_LOG_FUNCTION (this);
+
+      const char * c = filename.c_str ();
+      std::ofstream outputFile;
+      if (Simulator::Now () == Seconds (0))
+        {
+          // Delete contents of the file as it is opened
+          outputFile.open (c, std::ofstream::out | std::ofstream::trunc);
+        }
+      else
+        {
+          // Only append to the file
+          outputFile.open (c, std::ofstream::out | std::ofstream::app);
+        }
+
+      for (auto it = gateways.Begin (); it != gateways.End (); ++it)
+        {
+          int systemId = (*it)->GetId ();
+          outputFile <<  " " <<
+            std::to_string(systemId) << " " <<
+            m_packetTracker->PrintPhyPacketsPerGw(startTime,
+                                                  stopTime,
+                                                  systemId) << std::endl;
+        }
+
+        outputFile.close();
+    }
+
 }
 }
