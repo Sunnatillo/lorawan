@@ -94,6 +94,7 @@ LoraPacketTracker::MacGwReceptionCallback (Ptr<Packet const> packet)
       auto it = m_macPacketTracker.find (packet);
       if (it != m_macPacketTracker.end ())
         {
+          (*it).second.receivedTime = Simulator::Now ();           // added by Sunnatillo to extract delay
           (*it).second.receptionTimes.insert (std::pair<int, Time>
                                                 (Simulator::GetContext (),
                                                 Simulator::Now ()));
@@ -400,6 +401,54 @@ LoraPacketTracker::PrintPhyPacketsPerGw (Time startTime, Time stopTime,
     return std::to_string (sent) + " " +
       std::to_string (received);
   }
+
+void
+LoraPacketTracker::CountAverageDelay (Time startTime, Time stopTime)
+{
+
+  Time delaySum = Seconds (0);
+
+
+  for (auto itMac = m_macPacketTracker.begin (); itMac != m_macPacketTracker.end (); ++itMac)
+    {
+      // NS_LOG_DEBUG ("Dealing with packet " << (*itMac).first);
+
+          // Compute delays
+          /////////////////
+      //  std::cout << "send Time \t" <<(*itMac).second.sendTime  << std::endl;
+
+        Time earlisestReceiveTime = Seconds(0);
+        int i = 0;
+
+        for (auto it = (*itMac).second.receptionTimes.cbegin(); it != (*itMac).second.receptionTimes.cend(); ++it)
+        {
+      //  std::cout << "{" << (*it).first << ": " << (*it).second << "}\n";
+          if(i == 0){
+            i++;
+            earlisestReceiveTime = (*it).second;
+          }
+          Time currentReceiveTime = (*it).second;
+          if(currentReceiveTime < earlisestReceiveTime){
+            earlisestReceiveTime = currentReceiveTime;
+          }
+        }
+      //  std::cout << "earlisestReceiveTime " << earlisestReceiveTime << std::endl;
+        if(earlisestReceiveTime != 0){
+        delaySum += (earlisestReceiveTime-(*itMac).second.sendTime);
+      }
+      //  std::cout << " delaysum " << delaySum << std::endl ;
+        }
+
+  // Sum PHY outcomes
+  //////////////////////////////////
+  // vector performanceAmounts will contain - for the interval given in the
+  // input of the function, the following fields:
+  // totPacketsSent receivedPackets interferedPackets noMoreGwPackets underSensitivityPackets
+  std::cout << "Delay ";
+  std::cout << delaySum <<std::endl;
+  
+
+}
 
 }
 }

@@ -159,6 +159,9 @@ public:
    * of packets that generated a successful acknowledgment.
    */
   std::string CountMacPacketsGloballyCpsr (Time startTime, Time stopTime);
+
+  //change by Sunnatillo
+  void CountAverageDelay(Time startTime, Time stopTime);
 private:
   PhyPacketData m_packetTracker;
   MacPacketData m_macPacketTracker;
